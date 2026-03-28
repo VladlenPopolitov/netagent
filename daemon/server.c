@@ -43,14 +43,17 @@ static int setup_socket(void) {
     unlink(SOCK_PATH);
 
     int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (fd < 0)
+    if (fd < 0) {
+        syslog(LOG_ERR, "socket failed: %s", strerror(errno));
         return -1;
+    }
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
-    strcpy(addr.sun_path, SOCK_PATH);
+    strncpy(addr.sun_path, SOCK_PATH, sizeof(addr.sun_path)-1);
 
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        syslog(LOG_ERR, "bind failed: %s", strerror(errno));
         close(fd);
         return -1;
     }
@@ -59,6 +62,7 @@ static int setup_socket(void) {
 
     struct group *grp = getgrnam("netagent");
     if (!grp) {
+        syslog(LOG_ERR, "group netagent not found");
         close(fd);
         return -1;
     }
@@ -66,6 +70,7 @@ static int setup_socket(void) {
     chown(SOCK_PATH, 0, grp->gr_gid);
 
     if (listen(fd, 5) < 0) {
+        syslog(LOG_ERR, "listen failed: %s", strerror(errno));
         close(fd);
         return -1;
     }
@@ -84,6 +89,7 @@ static void handle_client(int client_fd) {
     struct xucred cred;
 
     if (get_peer_cred(client_fd, &cred) != 0) {
+        syslog(LOG_ERR, "get_peer_cred failed");
         send_error(client_fd, "EIO", "cred_failed");
         return;
     }
@@ -95,9 +101,15 @@ static void handle_client(int client_fd) {
 
     if (n < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            syslog(LOG_WARNING, "read timeout");
             send_error(client_fd, "ETIMEOUT", "read_timeout");
+        }
         else
+        {
+            syslog(LOG_ERR, "read error: %s", strerror(errno));
             send_error(client_fd, "EIO", "read_error");
+        }
         return;
     }
 
@@ -110,6 +122,11 @@ static void handle_client(int client_fd) {
     parse_request(buf, &req);
 
     if (!authorize(&cred, &req)) {
+        syslog(LOG_WARNING,
+            "unauthorized request: uid=%d gid=%d cmd=%s",
+            cred.cr_uid,
+            cred.cr_groups[0],
+            req.cmd ? req.cmd : "NULL");
         send_error(client_fd, "EPERM", "not_authorized");
         return;
     }
@@ -125,7 +142,7 @@ int server_run(int debug) {
 
     server_fd = setup_socket();
     if (server_fd < 0) {
-        perror("setup_socket");
+        syslog(LOG_ERR, "setup_socket failed");
         return 1;
     }
 
@@ -139,7 +156,7 @@ int server_run(int debug) {
         if (client_fd < 0) {
             if (stop_flag) break;
             if (errno == EINTR) continue;
-            perror("accept");
+            syslog(LOG_ERR, "accept failed: %s", strerror(errno));
             break;
         }
 

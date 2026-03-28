@@ -7,3 +7,25 @@ It provides a simple and secure interface (via a Unix socket) for configuring ne
 The project aims to offer a minimal, clean alternative to complex network managers, with a focus on security, simplicity, and extensibility.
 
 ⚠️ Work in progress — interfaces and features may change.
+
+## make
+
+```bash
+# make daemon 
+make
+```
+
+```bash
+# make python environment 
+make setup
+```
+
+```bash
+# clean 
+make clean
+```
+
+```bash
+# check client 
+make cli
+```

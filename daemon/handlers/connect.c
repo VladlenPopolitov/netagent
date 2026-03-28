@@ -1,8 +1,9 @@
 #include "connect.h"
-#include "../protocol.h"
-#include "../exec_safe.h"
-#include "../util.h"   // позже
+#include "protocol.h"
+#include "exec_safe.h"
+#include "util.h"   // позже
 #include <string.h>
+
 // system log output 
 #include <syslog.h>
 

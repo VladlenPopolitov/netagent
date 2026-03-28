@@ -5,9 +5,9 @@
 #include <syslog.h>
 
 #include "server.h"
+#include "util.h"
 
 int main(int argc, char **argv) {
-    int debug = 0;
 
     if (argc > 1 && strcmp(argv[1], "-d") == 0) {
         debug = 1;

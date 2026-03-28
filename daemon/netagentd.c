@@ -76,6 +76,7 @@ static int run_exec(const char *path, char *const argv[]) {
         }
         fprintf(stderr,"\n");
     }
+    
     pid_t pid = fork();
     if (pid < 0) return -1;
 
@@ -101,9 +102,14 @@ static int run_exec(const char *path, char *const argv[]) {
 
 static void handle_status(int fd, struct request *req) {
     (void)req;
-    dprintf(fd, "OK status=running\n");
+    
+    ///dprintf(fd, "OK status=running\n");
+    send_ok(fd);
+    send_data(fd, "status", "running");
+    send_end(fd);
+
     if (!debug)
-        syslog(LOG_INFO, "OK status=running");
+        syslog(LOG_INFO, "OK status=running.");
 }
 
 static void handle_list_interfaces(int fd, struct request *req) {
@@ -123,11 +129,13 @@ static void handle_list_interfaces(int fd, struct request *req) {
 
     char *tok = strtok(buf, " \n");
     while (tok) {
-        dprintf(fd, "DATA iface=%s\n", tok);
+        ///dprintf(fd, "DATA iface=%s\n", tok);
+        send_data(fd, "iface", tok);
         tok = strtok(NULL, " \n");
     }
 
-    send_str(fd, "END\n");
+    ///send_str(fd, "END\n");
+    send_end(fd);
 }
 
 

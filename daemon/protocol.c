@@ -32,6 +32,16 @@ int send_ok(int fd) {
     return send_str(fd, "OK\n");
 }
 
+int send_data(int fd, const char *key, const char *val) {
+    char buf[256];
+    snprintf(buf, sizeof(buf), "DATA %s=%s\n", key, val);
+    return safe_write(fd, buf, strlen(buf));
+}
+
+int send_end(int fd) {
+    return safe_write(fd, "END\n", 4);
+}
+
 void parse_request(char *line, struct request *req) {
     req->version = 1; // default
     req->cmd = NULL;

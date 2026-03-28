@@ -2,11 +2,15 @@
 CC      = cc
 CFLAGS  = -Wall -Wextra -O0 -g
 
+CFLAGS += -I. -Ihandlers
+
 # Target
 TARGET  = netagentd
 
 # Directories
 HANDLERS_DIR = handlers
+
+HANDLER_SRCS!= ls ${HANDLERS_DIR}/*.c
 
 # Sources
 SRCS = \
@@ -18,10 +22,8 @@ SRCS = \
 	policy.c \
 	util.c \
 	handlers.c \
-	$(HANDLERS_DIR)/list.c \
-	$(HANDLERS_DIR)/connect.c \
-	$(HANDLERS_DIR)/status.c
-
+	$(HANDLER_SRCS)
+	
 # Objects
 OBJS = $(SRCS:.c=.o)
 

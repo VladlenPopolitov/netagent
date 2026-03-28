@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// for debug
+#include "util.h"
+// system log output 
+#include <syslog.h>
+
 int exec_capture_output(const char *path, char *const argv[], char *outbuf, size_t outlen) {
     int pipefd[2];
     if (pipe(pipefd) < 0) return -1;
@@ -36,6 +41,31 @@ int exec_capture_output(const char *path, char *const argv[], char *outbuf, size
 }
 
 int run_exec(const char *path, char *const argv[]) {
+    if (debug) 
+    {
+        fprintf(stderr,"%s:",path);
+        char *const *argvv=argv;
+        while (*argvv!=NULL)
+        {
+            fprintf(stderr,"%s ",*argvv);
+            argvv++;
+        }
+        fprintf(stderr,"\n");
+    }
+    else
+    {
+        char buf[512];
+        int pos = snprintf(buf, sizeof(buf), "%s:", path);
+
+        char *const *argvv = argv;
+        while (*argvv != NULL && pos < (int)sizeof(buf) - 1)
+        {
+            pos += snprintf(buf + pos, sizeof(buf) - pos, "%s ", *argvv);
+            argvv++;
+        }
+
+        syslog(LOG_DEBUG, "%s", buf);
+    }
     pid_t pid = fork();
     if (pid < 0)
         return -1;

@@ -1,6 +1,8 @@
 #include <ctype.h>
 #include "util.h"
 
+int debug = 0;
+
 // allow only safe interface names: wlan0, em0, etc.
 int is_valid_iface(const char *s) {
     if (!s || !*s) return 0;
