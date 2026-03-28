@@ -1,0 +1,66 @@
+# =========================
+# C / build artifacts
+# =========================
+*.o
+*.a
+*.so
+*.core
+*.log
+
+netagentd
+
+# Make
+Makefile.bak
+
+# Debug / profiling
+*.out
+gmon.out
+
+# =========================
+# Editor / OS
+# =========================
+*~
+*.swp
+*.swo
+.DS_Store
+
+# VSCode
+.vscode/
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+
+# Packaging
+*.egg-info/
+dist/
+build/
+
+# pip cache
+pip-wheel-metadata/
+
+# =========================
+# Test / runtime files
+# =========================
+
+# Unix socket
+/var/run/netagent.sock
+
+# Local socket (если будешь менять путь для dev)
+*.sock
+
+# Logs (если появятся локальные)
+*.log
+
+# =========================
+# Misc
+# =========================
+.env
